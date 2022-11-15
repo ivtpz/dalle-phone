@@ -28,6 +28,7 @@ export async function create(
 
 export async function createPlayerOrdering(game: HydratedDocument<IGame>) {
   const orderedPlayers: Record<string, boolean> = {};
+  const gameID = game._id.toString();
 
   const gameWithPlayers = await game.populate('players');
   const players = gameWithPlayers.players as HydratedDocument<IPlayer>[];
@@ -39,7 +40,7 @@ export async function createPlayerOrdering(game: HydratedDocument<IGame>) {
         orderedPlayers[player?._id?.toString() || ''] = true;
         return !exists;
       })
-      .map(async (player) => PlayerOrdering.create({ current: player }))
+      .map(async (player) => PlayerOrdering.create({ current: player, gameID }))
   );
 
   return Promise.all(
@@ -55,4 +56,14 @@ export async function createPlayerOrdering(game: HydratedDocument<IGame>) {
       return po;
     })
   );
+}
+
+export async function getPreviousPlayerID(playerID: string, gameID: string) {
+  const playerOrdering = await PlayerOrdering.findOne({
+    gameID,
+    current: new ObjectId(playerID),
+  })
+    .populate('previous')
+    .exec();
+  return playerOrdering?.previous.current.toString();
 }

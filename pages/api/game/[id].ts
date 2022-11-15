@@ -1,6 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getPlayerFromCookie } from '../../../helpers';
-import { Action, getById, handleAction, Status } from '../../../service/game';
+import {
+  Action,
+  gameStateForPlayer,
+  getById,
+  handleAction,
+  Status,
+} from '../../../service/game';
 
 type Data = {
   id: string;
@@ -11,7 +17,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  // TODO: better way to manage db connection?
   const { id } = req.query;
   if (!id || typeof id !== 'string') {
     return res.status(400).end('Missing or invalid game ID');
@@ -25,13 +30,17 @@ export default async function handler(
     }
     switch (req.method) {
       case 'GET':
-        return res.status(200).json(foundGame.toJSON());
+        return res
+          .status(200)
+          .json(await gameStateForPlayer(player, foundGame));
 
       case 'PATCH':
         const { action } = req.body as { action: Action };
         const update = await handleAction(action, foundGame, player);
         if (update.status === Status.UPDATED) {
-          return res.status(200).json(update.game.toJSON());
+          return res
+            .status(200)
+            .json(await gameStateForPlayer(player, update.game));
         }
         return res.status(400).end(`Failed to update game. ${update.reason}`);
 

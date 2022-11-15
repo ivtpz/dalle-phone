@@ -11,11 +11,11 @@ export interface IMessage {
 
 // Will know the conversation ordering from the player ordering
 export const messageSchema = new Schema<IMessage>({
-  phrase: String,
-  imageURL: String,
-  author: { type: Schema.Types.ObjectId, ref: 'Player' },
-  round: Number,
-  gameID: String, // stored only for unique index, not storing a ref to the game
+  phrase: { type: String, required: true },
+  imageURL: { type: String, required: true },
+  author: { type: Schema.Types.ObjectId, ref: 'Player', required: true },
+  round: { type: Number, required: true },
+  gameID: { type: String, required: true }, // stored only for unique index, not storing a ref to the game
 });
 
 messageSchema.index({ author: 1, round: 1, gameID: 1 }, { unique: true });
