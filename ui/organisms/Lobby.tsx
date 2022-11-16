@@ -1,5 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
+import clsx from 'clsx';
 import React, { useState } from 'react';
+import { BiCopy } from 'react-icons/bi';
 import { useSWRConfig } from 'swr';
 import { IPlayer } from '../../db/schemas/player';
 import { Stringified } from '../../db/types';
@@ -20,6 +22,13 @@ export default function Lobby({
 }: LobbyProps) {
   const { mutate } = useSWRConfig();
   const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const doCopy = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+  };
+
   const onJoined = (res: AxiosResponse) => {
     // TODO: this loading state isn't right - need to set it inside the create / join form
     setLoading(true);
@@ -60,13 +69,35 @@ export default function Lobby({
         )}
       </div>
       <div>
-        {!hasJoined && (
+        {!hasJoined ? (
           <CreateOrJoinGameForm
             onJoined={onJoined}
             gameID={gameID}
             player={player}
             disabled={loading}
           />
+        ) : (
+          <div
+            role="button"
+            onClick={doCopy}
+            tabIndex={0}
+            onKeyUp={(e) => {
+              if (['Enter', 'c', 'C'].includes(e.key)) {
+                doCopy();
+              }
+            }}
+            className="flex items-center justify-center text-xl mt-2"
+          >
+            <span>Share this link with friends so they can join the fun</span>{' '}
+            <BiCopy
+              className={clsx('mx-2 cursor-pointer', {
+                'text-teal-400': copied,
+              })}
+            />
+            <div className={clsx('w-3', { 'float-away': copied })}>
+              {copied ? 'Copied!' : ''}
+            </div>
+          </div>
         )}
       </div>
     </div>
