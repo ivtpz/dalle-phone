@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useSWRConfig } from 'swr';
 import { HiOutlinePhoneArrowUpRight, HiCheckBadge } from 'react-icons/hi2';
 import { BiBot } from 'react-icons/bi';
+import { RequiredError } from 'openai/dist/base';
 import { GameStateForPlayer } from '../../service/game';
 import InputField from '../molecules/InputField';
 
@@ -21,6 +22,7 @@ export default function GameBoard({ gameState }: GameBoardProps) {
   const { mutate } = useSWRConfig();
   const [openapi, setOpenapi] = useState<OpenAIApi | null>(null);
   const [generatingImage, setGeneratingImage] = useState(false);
+  const [badMessage, setBadMessage] = useState<false | string>(false);
 
   useEffect(() => {
     const config = new Configuration({
@@ -32,34 +34,44 @@ export default function GameBoard({ gameState }: GameBoardProps) {
   }, []);
 
   const submitPhrase = async (e: any) => {
+    setBadMessage(false);
     if (!openapi) return;
     setGeneratingImage(true);
     e.preventDefault();
     const data = new FormData(e.target);
     const phrase = data.get('phrase');
     if (phrase) {
-      const result = await openapi.createImage({
-        prompt: phrase as string,
-        n: 1,
-        size: '256x256',
-      });
-      const { url } = result.data.data[0];
-      axios
-        .patch(`/api/game/${gameState.id}`, {
-          action: {
-            type: 'SUBMIT_MESSAGE',
-            payload: {
-              message: phrase,
-              imageURL: url,
-            },
-          },
-        })
-        .then(() => {
-          e.target.reset();
-          mutate(`/api/game/${gameState.id}`).then(() =>
-            setGeneratingImage(false)
-          );
+      try {
+        const result = await openapi.createImage({
+          prompt: phrase as string,
+          n: 1,
+          size: '256x256',
         });
+        const { url } = result.data.data[0];
+        axios
+          .patch(`/api/game/${gameState.id}`, {
+            action: {
+              type: 'SUBMIT_MESSAGE',
+              payload: {
+                message: phrase,
+                imageURL: url,
+              },
+            },
+          })
+          .then(() => {
+            e.target.reset();
+            mutate(`/api/game/${gameState.id}`).then(() =>
+              setGeneratingImage(false)
+            );
+          });
+      } catch (err) {
+        setGeneratingImage(false);
+        if ((err as RequiredError).message.includes('400')) {
+          setBadMessage("Dall-E didn't like that one.");
+        } else {
+          setBadMessage("Hmmmm, Dall-E doesn't want to play...");
+        }
+      }
     }
   };
 
@@ -89,6 +101,7 @@ export default function GameBoard({ gameState }: GameBoardProps) {
             <InputField
               fieldName="phrase"
               label={gameState.activeRound === 1 ? 'Starting phrase' : 'Guess'}
+              error={badMessage}
             />
 
             <button
@@ -112,7 +125,7 @@ export default function GameBoard({ gameState }: GameBoardProps) {
       <div className="w-1/4 ml-10">
         <h1 className="text-4xl mb-2 underline">Player Status</h1>
         {gameState.players.map((p) => (
-          <div className="flex mb-2 text-2xl items-center">
+          <div key={p._id} className="flex mb-2 text-2xl items-center">
             {p.doneWithRound ? (
               <HiCheckBadge className="w-7 h-6 mr-1 text-emerald-400" />
             ) : (

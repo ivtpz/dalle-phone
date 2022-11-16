@@ -1,3 +1,4 @@
+import { BiDownArrow } from 'react-icons/bi';
 import { Parallax } from 'react-scroll-parallax';
 import { IMessage } from '../../db/schemas/message';
 import { Stringified } from '../../db/types';
@@ -31,10 +32,11 @@ function FadeInVerticalLine() {
 export default function MessageReview({ threads }: MessageReviewProps) {
   return (
     <div className="ml-4 grid place-items-center">
-      {threads?.map((t) => (
+      {threads?.map((t, ti) => (
         <div className=" mt-12 mb-[200px] w-3/4" key={t[0].author._id}>
-          <h1 className="text-6xl md:text-8xl border-b-2 mb-10">
-            {t[0].author.name}&#39;s Thread
+          <h1 className="text-6xl md:text-8xl border-b-2 mb-10 flex">
+            <span>{t[0].author.name}&#39;s Thread</span>{' '}
+            {ti === 0 && <BiDownArrow className="ml-4 bouncing" />}
           </h1>
           {t.map((m, mi) => (
             <div key={`${m._id}`}>

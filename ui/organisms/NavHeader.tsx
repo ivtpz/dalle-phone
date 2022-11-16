@@ -6,6 +6,7 @@ const NavLink = styled(Link)`
   border-left: 1px solid white;
   margin: 4px;
   line-height: 20px;
+  color: white;
 `;
 
 const Title = styled.div`
@@ -19,7 +20,7 @@ export default function NavHeader() {
   return (
     <nav className="flex bg-teal-600 text-slate-100 mb-4">
       <Title>Dall-E Phone</Title>
-      <NavLink href="/">New</NavLink>
+      <NavLink href="/">New Game</NavLink>
     </nav>
   );
 }
