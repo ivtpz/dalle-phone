@@ -6,8 +6,10 @@ import { IPlayer } from '../db/schemas/player';
 import styles from '../styles/Home.module.css';
 import CreateGameForm from '../ui/organisms/CreateOrJoinGameForm';
 import { Stringified } from '../db/types';
+import connect from '../db/connection';
 
 export async function getServerSideProps(context: NextPageContext) {
+  await connect();
   const cookie = getCookie('user', { req: context.req, res: context.res });
   return {
     props: {

@@ -2,6 +2,7 @@ import { NextPageContext } from 'next';
 import { useRouter } from 'next/router';
 import React from 'react';
 import useSWR from 'swr';
+import connect from '../../db/connection';
 import fetcher from '../../data/fetcher';
 import { IPlayer } from '../../db/schemas/player';
 import { Stringified } from '../../db/types';
@@ -16,6 +17,7 @@ import Lobby from '../../ui/organisms/Lobby';
 import MessageReview from '../../ui/organisms/MessageReview';
 
 export async function getServerSideProps(context: NextPageContext) {
+  await connect();
   const gameId = context.query.id as string;
 
   const dbGame = await getById(gameId);

@@ -9,10 +9,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<PlayerData>
 ) {
-  const c = await connect();
-  if (!c) {
-    return res.status(500).end('Server connection error');
-  }
+  await connect();
   const { method, body } = req;
   const { playerName } = body;
   if (!playerName) {
