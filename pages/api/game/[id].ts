@@ -18,10 +18,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  const c = await connect();
-  if (!c) {
-    return res.status(500).end('Server connection error');
-  }
+  await connect();
   const { id } = req.query;
   if (!id || typeof id !== 'string') {
     return res.status(400).end('Missing or invalid game ID');
