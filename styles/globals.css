@@ -147,3 +147,22 @@ a {
     transform: translateY(15px);
   }
 }
+
+.float-away {
+  animation: floatAway 3s forwards;
+}
+
+@keyframes floatAway {
+  0% {
+    transform: translateY(0px);
+    scale: 0.9;
+  }
+  10% {
+    transform: translateY(0px);
+    scale: 1.1;
+  }
+  100% {
+    transform: translateY(-150px);
+    scale: 1;
+  }
+}
