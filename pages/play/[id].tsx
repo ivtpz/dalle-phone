@@ -1,22 +1,26 @@
 import { NextPageContext } from 'next';
+import { useRouter } from 'next/router';
 import React from 'react';
+import useSWR from 'swr';
+import fetcher from '../../data/fetcher';
 import { IPlayer } from '../../db/schemas/player';
+import { Stringified } from '../../db/types';
 import { getPlayerFromCookie } from '../../helpers';
 import {
   GameStateForPlayer,
   gameStateForPlayer,
   getById,
-  handleAction,
 } from '../../service/game';
 import GameBoard from '../../ui/organisms/GameBoard';
 import Lobby from '../../ui/organisms/Lobby';
+import MessageReview from '../../ui/organisms/MessageReview';
 
 export async function getServerSideProps(context: NextPageContext) {
   const gameId = context.query.id as string;
 
-  const game = await getById(gameId);
+  const dbGame = await getById(gameId);
 
-  if (!game) {
+  if (!dbGame) {
     return {
       redirect: {
         destination: '/',
@@ -25,40 +29,52 @@ export async function getServerSideProps(context: NextPageContext) {
     };
   }
 
-  await game?.populate('players');
+  if (!context.req || !context.res) {
+    return {
+      props: {},
+    };
+  }
 
   const player = await getPlayerFromCookie(context.req, context.res);
-  if (!player) {
-    return { props: { player: null, game: JSON.parse(JSON.stringify(game)) } };
-  }
-
-  const hasJoined =
-    player &&
-    !!game?.players.find((p) => p._id.toString() === player._id.toString());
-
-  if (!hasJoined) {
-    await handleAction({ type: 'JOIN_GAME' }, game, player);
-  }
-
+  const game = await gameStateForPlayer(dbGame, player);
   return {
     props: {
-      game: await gameStateForPlayer(player, game),
-      player: JSON.parse(JSON.stringify(player)),
+      player: player ? JSON.parse(JSON.stringify(player)) : null,
+      fallback: {
+        [`/api/game/${gameId}`]: game,
+      },
     },
   };
 }
 
 interface PlayGameProps {
-  game: GameStateForPlayer;
-  player: IPlayer | null;
+  player: Stringified<IPlayer> | null;
 }
 
-export default function PlayGame({ game, player }: PlayGameProps) {
-  if (game.activeRound === 0) {
-    return <Lobby players={game.players} player={player} gameID={game.id} />;
+export default function PlayGame({ player }: PlayGameProps) {
+  const {
+    query: { id },
+  } = useRouter();
+  const { data } = useSWR<GameStateForPlayer>(`/api/game/${id}`, fetcher, {
+    refreshInterval: 1000,
+  });
+
+  if (!data) {
+    return null;
   }
-  if (game.activeRound === -1) {
-    return <div>TODO: show the results</div>;
+
+  if (data.activeRound === 0) {
+    return (
+      <Lobby
+        players={data.players}
+        player={player}
+        gameID={data.id}
+        hasJoined={data.hasJoined}
+      />
+    );
   }
-  return <GameBoard gameState={game} />;
+  if (data.activeRound === -1) {
+    return <MessageReview threads={data.finalThreads ?? [[]]} />;
+  }
+  return <GameBoard gameState={data as GameStateForPlayer} />;
 }

@@ -1,7 +1,8 @@
 import { model, Schema, models, Model } from 'mongoose';
+import { IMongoSchema } from '../types';
 import { IPlayer } from './player';
 
-export interface IMessage {
+export interface IMessage extends IMongoSchema {
   phrase: string;
   imageURL: string;
   author: IPlayer;

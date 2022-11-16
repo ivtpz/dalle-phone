@@ -1,10 +1,11 @@
 import { getCookie } from 'cookies-next';
+import { IncomingMessage, ServerResponse } from 'http';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getById } from './service/player';
 
 export async function getPlayerFromCookie(
-  req: NextApiRequest,
-  res: NextApiResponse
+  req: NextApiRequest | IncomingMessage,
+  res: NextApiResponse | ServerResponse<IncomingMessage>
 ) {
   const userCookie = getCookie('user', { req, res });
   if (!userCookie || typeof userCookie !== 'string') {

@@ -32,7 +32,7 @@ export default async function handler(
       case 'GET':
         return res
           .status(200)
-          .json(await gameStateForPlayer(player, foundGame));
+          .json(await gameStateForPlayer(foundGame, player));
 
       case 'PATCH':
         const { action } = req.body as { action: Action };
@@ -40,7 +40,7 @@ export default async function handler(
         if (update.status === Status.UPDATED) {
           return res
             .status(200)
-            .json(await gameStateForPlayer(player, update.game));
+            .json(await gameStateForPlayer(update.game, player));
         }
         return res.status(400).end(`Failed to update game. ${update.reason}`);
 

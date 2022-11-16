@@ -2,7 +2,8 @@ import { HydratedDocument } from 'mongoose';
 import { IGame } from '../db/schemas/game';
 import { IMessage, Message } from '../db/schemas/message';
 import { IPlayer } from '../db/schemas/player';
-import { PlayerOrdering } from '../db/schemas/playerOrdering';
+import { IPlayerOrdering, PlayerOrdering } from '../db/schemas/playerOrdering';
+import { Stringified } from '../db/types';
 
 /**
  * Creates a message record and adds it to the game's messages.
@@ -30,12 +31,18 @@ export async function addMessageToGame(
 }
 
 export const getFinalThreads = async (game: HydratedDocument<IGame>) => {
+  await game.populate({
+    path: 'messages',
+    populate: {
+      path: 'author',
+      model: 'Player',
+    },
+  });
   if (game.activeRound === -1) {
-    const finalThreads: IMessage[][] = new Array(
-      game.messages.filter((m) => m.round === 1).length
-    )
-      .fill(1)
-      .map((_) => []);
+    const finalThreads: Stringified<IMessage>[][] = Array.from(
+      new Array(game.messages.filter((m) => m.round === 1).length),
+      () => []
+    );
 
     const orderings = await Promise.all(
       // TODO: use getPreviousPlayerID helper from player service
@@ -47,24 +54,24 @@ export const getFinalThreads = async (game: HydratedDocument<IGame>) => {
       )
     );
     const orderingMap = orderings
-      .filter((o) => !!o)
+      .filter((o): o is HydratedDocument<IPlayerOrdering> => !!o)
       .reduce(
         (map, o) => ({
           ...map,
-          [o.current]: o?.previous.current.toString(),
+          [o.current.toString()]: o?.previous.current.toString(),
         }),
-        {}
+        {} as Record<string, string>
       );
-    for (let i = 0; i < finalThreads.length; i++) {
+    for (let i = 0; i < finalThreads.length; i += 1) {
       const round = i + 1;
       const messages = game.messages.filter((m) => m.round === round);
       messages.forEach((m, mIdx) => {
-        const previousPlayerID = orderingMap[m.author];
+        const previousPlayerID = orderingMap[m.author._id.toString()];
         const thread =
           i > 0
             ? finalThreads?.find(
                 (t) =>
-                  t[t.length - 1].author.toString() === previousPlayerID &&
+                  t[t.length - 1].author._id.toString() === previousPlayerID &&
                   t[t.length - 1].round === round - 1
               )
             : finalThreads[mIdx];

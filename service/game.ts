@@ -4,6 +4,7 @@ import { Game, IGame } from '../db/schemas/game';
 import { IPlayer } from '../db/schemas/player';
 import { createPlayerOrdering, getPreviousPlayerID } from './player';
 import { addMessageToGame, getFinalThreads } from './message';
+import { Stringified } from '../db/types';
 
 export async function create(player: IPlayer) {
   const game = await Game.create({
@@ -53,21 +54,24 @@ export async function getImageToGuess(
 export type GameStateForPlayer = Awaited<ReturnType<typeof gameStateForPlayer>>;
 
 export async function gameStateForPlayer(
-  player: HydratedDocument<IPlayer>,
-  game: HydratedDocument<IGame>
+  game: HydratedDocument<IGame>,
+  player?: HydratedDocument<IPlayer> | null
 ) {
   await game.populate('players');
   await game.populate('messages');
-  const guessSubmitted = alreadyGuessed(player._id.toString(), game);
-  const imageToGuess = guessSubmitted
-    ? null
-    : await getImageToGuess(player._id.toString(), game);
+  const guessSubmitted = player
+    ? alreadyGuessed(player._id.toString(), game)
+    : false;
+  const imageToGuess =
+    guessSubmitted || !player
+      ? null
+      : await getImageToGuess(player._id.toString(), game);
 
   const finalThreads = await getFinalThreads(game);
 
   return {
     players: game.players.map((p) => {
-      const parsed = JSON.parse(JSON.stringify(p));
+      const parsed: Stringified<IPlayer> = JSON.parse(JSON.stringify(p));
       return {
         ...parsed,
         doneWithRound:
@@ -75,16 +79,19 @@ export async function gameStateForPlayer(
             ? !!game.messages.find(
                 (m) =>
                   m.round === game.activeRound &&
-                  m.author.toString() === parsed._id
+                  m.author._id.toString() === parsed._id
               )
             : false,
       };
     }),
     imageToGuess,
     activeRound: game.activeRound,
-    id: game._id,
+    id: game._id.toString(),
     guessSubmitted,
     finalThreads,
+    hasJoined:
+      !!player &&
+      !!game?.players.find((p) => p._id.toString() === player._id.toString()),
   };
 }
 

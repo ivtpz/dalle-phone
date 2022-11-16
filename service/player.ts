@@ -1,11 +1,11 @@
 import { ObjectId } from 'mongodb';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, ObjectId as TObjectId } from 'mongoose';
 import { IPlayer, Player } from '../db/schemas/player';
 import { PlayerOrdering } from '../db/schemas/playerOrdering';
 import { IGame } from '../db/schemas/game';
 
 export type PlayerData = {
-  id: ObjectId;
+  id: TObjectId;
   name: string;
 };
 
@@ -15,7 +15,7 @@ export async function getById(id: string) {
 
 export async function create(
   name: string
-): Promise<{ id: ObjectId; name: string } | null> {
+): Promise<{ id: TObjectId; name: string } | null> {
   try {
     const player = await Player.create({
       name,

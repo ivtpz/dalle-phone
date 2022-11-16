@@ -1,60 +1,72 @@
-import axios from 'axios';
-import React from 'react';
+import axios, { AxiosResponse } from 'axios';
+import React, { useState } from 'react';
+import { useSWRConfig } from 'swr';
 import { IPlayer } from '../../db/schemas/player';
+import { Stringified } from '../../db/types';
+import CreateOrJoinGameForm from './CreateOrJoinGameForm';
 
 interface LobbyProps {
-  players: IPlayer[];
+  players: Stringified<IPlayer>[];
+  player: Stringified<IPlayer> | null;
+  gameID: string;
+  hasJoined?: boolean;
 }
 
-export default function Lobby({ players, player, gameID }: LobbyProps) {
-  const joinGame = (e) => {
-    e.preventDefault();
-    const data = new FormData(e.target);
-    const playerName = data.get('playerName');
-    const apiKey = data.get('apiKey') as string;
-    const org = data.get('org') as string;
-    if (playerName && apiKey) {
-      localStorage.setItem('playerAPIKey', apiKey);
-      localStorage.setItem('playerOrg', org);
-      axios.post('/api/player/create', { playerName }).then((res) => {
-        if (res.status === 200) {
-          axios
-            .patch(`/api/game/${gameID}`, { action: { type: 'JOIN_GAME' } })
-            .then((r) => {
-              console.log(r);
-            });
-        }
-      });
+export default function Lobby({
+  players,
+  player,
+  gameID,
+  hasJoined,
+}: LobbyProps) {
+  const { mutate } = useSWRConfig();
+  const [loading, setLoading] = useState(false);
+  const onJoined = (res: AxiosResponse) => {
+    // TODO: this loading state isn't right - need to set it inside the create / join form
+    setLoading(true);
+    if (res.status === 200) {
+      mutate(`/api/game/${gameID}`).then(() => setLoading(false));
     }
   };
 
   const startGame = () => {
+    setLoading(true);
     axios
       .patch(`/api/game/${gameID}`, { action: { type: 'START_GAME' } })
-      .then((r) => {
-        console.log(r);
+      .then(() => {
+        mutate(`/api/game/${gameID}`).then(() => setLoading(false));
       });
   };
 
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-2 gap-4 m-4">
       <div>
+        <div className="mb-2 border-b-2">
+          <h1 className="text-4xl">Players</h1>
+        </div>
         {players.map((p) => (
-          <div>{p.name}</div>
+          <div className="text-2xl" key={p._id}>
+            {p.name}
+          </div>
         ))}
-      </div>
-      <div>
-        {player ? (
-          <button type="button" onClick={startGame}>
+        {hasJoined && (
+          <button
+            className="btn btn-violet mt-4 float-right"
+            type="button"
+            onClick={startGame}
+            disabled={loading}
+          >
             Start Game
           </button>
-        ) : (
-          <form onSubmit={joinGame}>
-            <input type="text" name="playerName" placeholder="name" />
-            <input type="text" name="apiKey" placeholder="OpenAI API Key" />
-            <input type="text" name="org" placeholder="OpenAI API Org ID" />
-            <button type="submit">Join Game</button>
-          </form>
+        )}
+      </div>
+      <div>
+        {!hasJoined && (
+          <CreateOrJoinGameForm
+            onJoined={onJoined}
+            gameID={gameID}
+            player={player}
+            disabled={loading}
+          />
         )}
       </div>
     </div>
