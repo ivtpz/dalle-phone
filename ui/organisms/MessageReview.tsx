@@ -22,8 +22,9 @@ function LinePiece() {
 function FadeInVerticalLine() {
   return (
     <>
-      {new Array(10).fill('').map(() => (
-        <LinePiece />
+      {new Array(10).fill('').map((_, i) => (
+        // eslint-disable-next-line react/no-array-index-key
+        <LinePiece key={i} />
       ))}
     </>
   );

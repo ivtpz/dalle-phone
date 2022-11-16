@@ -7,6 +7,7 @@ import {
   handleAction,
   Status,
 } from '../../../service/game';
+import connect from '../../../db/connection';
 
 type Data = {
   id: string;
@@ -17,6 +18,10 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
+  const c = await connect();
+  if (!c) {
+    return res.status(500).end('Server connection error');
+  }
   const { id } = req.query;
   if (!id || typeof id !== 'string') {
     return res.status(400).end('Missing or invalid game ID');

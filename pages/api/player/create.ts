@@ -3,11 +3,16 @@ import { setCookie } from 'cookies-next';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { create } from '../../../service/player';
 import type { PlayerData } from '../../../service/player';
+import connect from '../../../db/connection';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<PlayerData>
 ) {
+  const c = await connect();
+  if (!c) {
+    return res.status(500).end('Server connection error');
+  }
   const { method, body } = req;
   const { playerName } = body;
   if (!playerName) {

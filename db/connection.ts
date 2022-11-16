@@ -21,7 +21,6 @@ const dbConnect = async () => {
   if (cached.conn) {
     return cached.conn;
   }
-  console.log('attempting connection', uri);
   cached.promise = mongoose.connect(uri, options).then((m) => m);
   cached.conn = await cached.promise;
   return cached.conn;
