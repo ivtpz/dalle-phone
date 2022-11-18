@@ -1,26 +1,35 @@
+import { Rubik_Glitch } from '@next/font/google';
+import clsx from 'clsx';
 import Link from 'next/link';
-import styled from '@emotion/styled';
+import { useRouter } from 'next/router';
 
-const NavLink = styled(Link)`
-  padding: 10px;
-  border-left: 1px solid white;
-  margin: 4px;
-  line-height: 20px;
-  color: white;
-`;
-
-const Title = styled.div`
-  padding: 5px;
-  font-weight: 700;
-  margin: 4px;
-  font-size: 1.25rem;
-`;
+const rubikGlitch = Rubik_Glitch({
+  weight: '400',
+});
 
 export default function NavHeader() {
+  const { pathname } = useRouter();
   return (
-    <nav className="flex bg-teal-600 text-slate-100 mb-4">
-      <Title>Dall-E Phone</Title>
-      <NavLink href="/">New Game</NavLink>
+    <nav className="grid grid-cols-12 bg-teal-600 text-slate-100 mb-4">
+      <div className="col-span-2 lg:col-span-1" />
+      <div
+        className={clsx(
+          'm-2 p-1 text-2xl sm:text-3xl md:text-5xl col-span-8 lg:col-span-10 text-center',
+          rubikGlitch.className
+        )}
+      >
+        Dall·E Phone
+      </div>
+      <div className="col-span-2 lg:col-span-1 flex items-center justify-center">
+        {pathname !== '/' && (
+          <Link
+            href="/"
+            className="text-l md:text-xl text-slate-100 whitespace-nowrap"
+          >
+            New Game
+          </Link>
+        )}
+      </div>
     </nav>
   );
 }
