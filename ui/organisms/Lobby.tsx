@@ -43,16 +43,16 @@ export default function Lobby({
   return (
     <div className={clsx('flex flex-col items-center gap-4')}>
       <div>
-        <div>
-          {!hasJoined && (
+        {!hasJoined && (
+          <div className="mb-4">
             <CreateOrJoinGameForm
               onJoined={onJoined}
               gameID={gameID}
               player={player}
               disabled={loading}
             />
-          )}
-        </div>
+          </div>
+        )}
         <div className="glow-border">
           <div className="mb-4">
             <h1 className="text-4xl underline">Players</h1>
