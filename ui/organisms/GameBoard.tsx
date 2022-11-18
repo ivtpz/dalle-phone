@@ -67,20 +67,47 @@ export default function GameBoard({ gameState }: GameBoardProps) {
       } catch (err) {
         setGeneratingImage(false);
         if ((err as RequiredError).message.includes('400')) {
-          setBadMessage("Dall-E didn't like that one.");
+          setBadMessage("Dall·E didn't like that one.");
         } else {
-          setBadMessage("Hmmmm, Dall-E doesn't want to play...");
+          setBadMessage("Hmmmm, Dall·E doesn't want to play...");
         }
       }
     }
   };
 
   return (
-    <div className="flex justify-start ml-4 mr-4">
-      <div className="w-3/4">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <div className="glow-border h-[60vh] lg:h-[80vh] lg:col-span-8 flex flex-col-reverse justify-between items-center">
+        {((gameState.activeRound === 1 && !gameState.guessSubmitted) ||
+          gameState.imageToGuess) && (
+          <form onSubmit={submitPhrase} className="mr-4 w-full p-4">
+            <InputField
+              fieldName="phrase"
+              label={gameState.activeRound === 1 ? 'Starting phrase' : 'Guess'}
+              error={badMessage}
+            />
+            <div className="flex justify-end">
+              <button
+                className="btn btn-violet"
+                type="submit"
+                disabled={generatingImage}
+              >
+                {generatingImage ? (
+                  <div className="flex">
+                    <HiOutlinePhoneArrowUpRight className="w-7 h-6 mr-7" />{' '}
+                    <div className="dot-collision mt-1.5" />
+                    <BiBot className="w-7 h-6 ml-7" />
+                  </div>
+                ) : (
+                  'Submit phrase'
+                )}
+              </button>
+            </div>
+          </form>
+        )}
         {gameState.guessSubmitted && (
           <img
-            className="w-1/2"
+            className="h-full"
             alt="waiting"
             src={
               waitingGifs[Math.floor(Math.random() * waitingGifs.length)] ||
@@ -90,50 +117,29 @@ export default function GameBoard({ gameState }: GameBoardProps) {
         )}
         {gameState.imageToGuess && (
           <img
-            className="w-96 mb-8"
+            className="h-full mb-8"
             alt="Pending guess"
             src={gameState.imageToGuess}
           />
         )}
-        {((gameState.activeRound === 1 && !gameState.guessSubmitted) ||
-          gameState.imageToGuess) && (
-          <form onSubmit={submitPhrase}>
-            <InputField
-              fieldName="phrase"
-              label={gameState.activeRound === 1 ? 'Starting phrase' : 'Guess'}
-              error={badMessage}
-            />
-
-            <button
-              className="btn btn-violet"
-              type="submit"
-              disabled={generatingImage}
-            >
-              {generatingImage ? (
-                <div className="flex">
-                  <HiOutlinePhoneArrowUpRight className="w-7 h-6 mr-7" />{' '}
-                  <div className="dot-collision mt-1.5" />
-                  <BiBot className="w-7 h-6 ml-7" />
-                </div>
-              ) : (
-                'Submit phrase'
-              )}
-            </button>
-          </form>
-        )}
       </div>
-      <div className="w-1/4 ml-10">
-        <h1 className="text-4xl mb-2 underline">Player Status</h1>
-        {gameState.players.map((p) => (
-          <div key={p._id} className="flex mb-2 text-2xl items-center">
-            {p.doneWithRound ? (
-              <HiCheckBadge className="w-7 h-6 mr-1 text-emerald-400" />
-            ) : (
-              <HiOutlinePhoneArrowUpRight className="w-7 h-6 mr-1" />
-            )}
-            {p.name}
-          </div>
-        ))}
+      <div className="lg:col-span-4 flex justify-center">
+        <div className="glow-border w-full h-fit">
+          <h1 className="text-4xl p-2 underline hide-sm">Player Status</h1>
+          {gameState.players.map((p) => (
+            <div
+              key={p._id}
+              className="flex m-1 text-2xl items-center glow-border-i"
+            >
+              {p.doneWithRound ? (
+                <HiCheckBadge className="w-7 h-6 mr-1 text-emerald-400" />
+              ) : (
+                <HiOutlinePhoneArrowUpRight className="w-7 h-6 mr-1" />
+              )}
+              {p.name}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

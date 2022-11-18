@@ -29,7 +29,7 @@ a {
 }
 
 .btn {
-  @apply font-bold py-2 px-4 rounded;
+  @apply font-bold py-2 px-4 rounded w-fit;
 }
 .btn-violet {
   @apply bg-violet-500 text-white;
@@ -69,6 +69,26 @@ a {
 
 .input-txt-lbl {
   @apply absolute top-0 -z-1 origin-0 duration-200;
+}
+
+.hide-sm {
+  @apply hidden sm:inline;
+}
+
+.invis-sm {
+  @apply invisible sm:visible;
+}
+
+.only-sm {
+  @apply sm:hidden;
+}
+
+.glow-border {
+  @apply border-2 border-violet-500 rounded-lg shadow-glow p-4;
+}
+
+.glow-border-i {
+  @apply border-2 border-teal-500 rounded-lg shadow-glow-i p-4;
 }
 
 .dot-collision {
@@ -156,13 +176,18 @@ a {
   0% {
     transform: translateY(0px);
     scale: 0.9;
+    opacity:1;
   }
   10% {
     transform: translateY(0px);
     scale: 1.1;
   }
+  90% {
+    opacity: 1;
+  }
   100% {
-    transform: translateY(-150px);
+    transform: translateY(-350px);
     scale: 1;
+    opacity: 0;
   }
 }

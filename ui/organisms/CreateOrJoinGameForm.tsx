@@ -54,43 +54,50 @@ export default function CreateOrJoinGameForm({
   };
 
   return (
-    <form onSubmit={joinGame} className="mt-2 w-[470px]">
-      <div className="grid grid-col-1 gap-2 w-[470px]">
-        <InputField
-          fieldName="playerName"
-          label="Name"
-          defaultValue={player?.name}
-        />
-        <InputField
-          type="password"
-          fieldName="apiKey"
-          label="API Key"
-          defaultValue={APICreds.APIKey ?? undefined}
-        />
-        <InputField
-          fieldName="orgID"
-          label="Organization ID"
-          defaultValue={APICreds.orgID ?? undefined}
-        />
-      </div>
-      <div className="mb-2 flex items-center space-x-1">
-        <BiInfoCircle className="mr-1 w-8" />
-        <div>
-          Get an OpenAI API key{' '}
-          <a href="https://beta.openai.com/account/api-keys" target="blank">
-            here
-          </a>
-          . It&#39;s kept in your browser&#39;s local storage, and only sent to
-          the Dall-E API.
+    <div className="glow-border p-4">
+      <form onSubmit={joinGame} className="max-w-[470px] flex-col items-end">
+        <div className="grid grid-cols-1 gap-2">
+          <InputField
+            fieldName="playerName"
+            label="Name"
+            defaultValue={player?.name}
+          />
+          <InputField
+            type="password"
+            fieldName="apiKey"
+            label="API Key"
+            defaultValue={APICreds.APIKey ?? undefined}
+          />
+          <InputField
+            fieldName="orgID"
+            label="Organization ID"
+            defaultValue={APICreds.orgID ?? undefined}
+          />
         </div>
-      </div>
-      <button
-        className="btn btn-violet float-right"
-        type="submit"
-        disabled={disabled}
-      >
-        {gameID ? 'Join' : 'Create'} Game
-      </button>
-    </form>
+        <div className="mb-2 flex items-center space-x-1">
+          <BiInfoCircle className="mr-1 w-16 text-3xl" />
+          <div>
+            Get an OpenAI API key{' '}
+            <a href="https://beta.openai.com/account/api-keys" target="blank">
+              here
+            </a>
+            , or find your Organization ID{' '}
+            <a
+              href="https://beta.openai.com/account/org-settings"
+              target="blank"
+            >
+              here
+            </a>
+            . Both will be kept in your browser&#39;s local storage, and only
+            sent to the Dall·E API.
+          </div>
+        </div>
+        <div className="flex justify-end">
+          <button className="btn btn-violet" type="submit" disabled={disabled}>
+            {gameID ? 'Join' : 'Create'} Game
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }

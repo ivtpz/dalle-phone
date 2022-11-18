@@ -32,13 +32,18 @@ function FadeInVerticalLine() {
 
 export default function MessageReview({ threads }: MessageReviewProps) {
   return (
-    <div className="ml-4 grid place-items-center">
-      {threads?.map((t, ti) => (
-        <div className=" mt-12 mb-[200px] w-3/4" key={t[0].author._id}>
-          <h1 className="text-6xl md:text-8xl border-b-2 mb-10 flex">
-            <span>{t[0].author.name}&#39;s Thread</span>{' '}
-            {ti === 0 && <BiDownArrow className="ml-4 bouncing" />}
-          </h1>
+    <div className="grid place-items-center">
+      {threads?.map((t) => (
+        <div
+          className="mb-[200px] sm:w-3/4 glow-border-i"
+          key={t[0].author._id}
+        >
+          <div className="flex justify-center">
+            <h1 className="text-6xl md:text-8xl mb-10 flex items-center">
+              <span>{t[0].author.name}&#39;s Thread</span>{' '}
+              <BiDownArrow className="ml-4 text-4xl md:text-6xl bouncing" />
+            </h1>
+          </div>
           {t.map((m, mi) => (
             <div key={`${m._id}`}>
               <Parallax
@@ -47,7 +52,7 @@ export default function MessageReview({ threads }: MessageReviewProps) {
                 shouldAlwaysCompleteAnimation
                 className="flex justify-center w-[100%]"
               >
-                <div className="border-2 border-violet-600 rounded p-2 w-[50%]">
+                <div className="glow-border sm:w-[50%]">
                   <h2 className="text-4xl md:text-6xl text-center">
                     {m.phrase}
                   </h2>
@@ -66,7 +71,7 @@ export default function MessageReview({ threads }: MessageReviewProps) {
                 shouldAlwaysCompleteAnimation
                 className="flex justify-center"
               >
-                <div className="border-2 border-violet-600 rounded p-1 w-[50%] bg-teal-600">
+                <div className="glow-border sm:w-[50%]">
                   <img className="w-[100%]" src={m.imageURL} alt={m.phrase} />
                 </div>
               </Parallax>

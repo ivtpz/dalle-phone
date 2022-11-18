@@ -11,12 +11,14 @@
     "project": "./tsconfig.json"
   },
   "plugins": [
-    "@typescript-eslint"
+    "@typescript-eslint",
+    "prettier"
   ],
   "rules": {
     "no-underscore-dangle": "off",
     "no-case-declarations": "off",
     "react/require-default-props": "off",
-    "react/react-in-jsx-scope": "off"
+    "react/react-in-jsx-scope": "off",
+    "prettier/prettier": 2
   }
 }
