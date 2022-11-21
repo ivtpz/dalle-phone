@@ -11,6 +11,14 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Rubik+Glitch&display=swap"
+          rel="stylesheet"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Rubik&display=swap"
+          rel="stylesheet"
+        />
         <title>Dall·E Phone</title>
       </Head>
       <Layout>
