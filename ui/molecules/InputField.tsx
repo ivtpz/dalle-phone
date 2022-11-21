@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React, { DetailedHTMLProps, InputHTMLAttributes, useState } from 'react';
 import { HiEye, HiEyeSlash } from 'react-icons/hi2';
 
-interface InputFieldProps {
+interface InputFieldProps
+  extends DetailedHTMLProps<
+    InputHTMLAttributes<HTMLInputElement>,
+    HTMLInputElement
+  > {
   fieldName: string;
   label: string;
   defaultValue?: string | number;
@@ -15,6 +19,7 @@ export default function InputField({
   defaultValue,
   type = 'text',
   error,
+  ...inputProps
 }: InputFieldProps) {
   const [fieldType, setFieldType] = useState(type);
   return (
@@ -25,9 +30,8 @@ export default function InputField({
           type={fieldType}
           name={fieldName}
           id={fieldName}
-          defaultValue={defaultValue}
           placeholder=""
-          required
+          {...inputProps}
         />
         <label className="input-txt-lbl" htmlFor={fieldName}>
           {label}

@@ -2,7 +2,11 @@
 import { HydratedDocument } from 'mongoose';
 import { Game, IGame } from '../db/schemas/game';
 import { IPlayer } from '../db/schemas/player';
-import { createPlayerOrdering, getPreviousPlayerID } from './player';
+import {
+  createPlayerOrdering,
+  getPreviousPlayerID,
+  IPlayerData,
+} from './player';
 import { addMessageToGame, getFinalThreads } from './message';
 import { Stringified } from '../db/types';
 
@@ -55,7 +59,7 @@ export type GameStateForPlayer = Awaited<ReturnType<typeof gameStateForPlayer>>;
 
 export async function gameStateForPlayer(
   game: HydratedDocument<IGame>,
-  player?: HydratedDocument<IPlayer> | null
+  player?: IPlayerData | null
 ) {
   await game.populate('players');
   await game.populate('messages');

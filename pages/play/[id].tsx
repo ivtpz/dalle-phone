@@ -4,8 +4,6 @@ import React from 'react';
 import useSWR from 'swr';
 import connect from '../../db/connection';
 import fetcher from '../../data/fetcher';
-import { IPlayer } from '../../db/schemas/player';
-import { Stringified } from '../../db/types';
 import { getPlayerFromCookie } from '../../helpers';
 import {
   GameStateForPlayer,
@@ -15,6 +13,7 @@ import {
 import GameBoard from '../../ui/organisms/GameBoard';
 import Lobby from '../../ui/organisms/Lobby';
 import MessageReview from '../../ui/organisms/MessageReview';
+import { IPlayerData } from '../../service/player';
 
 export async function getServerSideProps(context: NextPageContext) {
   await connect();
@@ -50,7 +49,7 @@ export async function getServerSideProps(context: NextPageContext) {
 }
 
 interface PlayGameProps {
-  player: Stringified<IPlayer> | null;
+  player: IPlayerData | null;
 }
 
 export default function PlayGame({ player }: PlayGameProps) {
@@ -78,5 +77,10 @@ export default function PlayGame({ player }: PlayGameProps) {
   if (data.activeRound === -1) {
     return <MessageReview threads={data.finalThreads ?? [[]]} />;
   }
-  return <GameBoard gameState={data as GameStateForPlayer} />;
+  return (
+    <GameBoard
+      gameState={data as GameStateForPlayer}
+      freeloader={player?.freeloader}
+    />
+  );
 }

@@ -10,6 +10,7 @@ import InputField from '../molecules/InputField';
 
 interface GameBoardProps {
   gameState: GameStateForPlayer;
+  freeloader?: boolean;
 }
 
 const waitingGifs = [
@@ -18,7 +19,7 @@ const waitingGifs = [
   'https://media.tenor.com/zONeTx1W3zAAAAAC/waiting.gif',
 ];
 
-export default function GameBoard({ gameState }: GameBoardProps) {
+export default function GameBoard({ gameState, freeloader }: GameBoardProps) {
   const { mutate } = useSWRConfig();
   const [openapi, setOpenapi] = useState<OpenAIApi | null>(null);
   const [generatingImage, setGeneratingImage] = useState(false);
@@ -42,12 +43,16 @@ export default function GameBoard({ gameState }: GameBoardProps) {
     const phrase = data.get('phrase');
     if (phrase) {
       try {
-        const result = await openapi.createImage({
-          prompt: phrase as string,
-          n: 1,
-          size: '256x256',
-        });
-        const { url } = result.data.data[0];
+        const url = freeloader
+          ? (await axios({ url: '/api/dall-e', params: { search: phrase } }))
+              .data.imageURL
+          : (
+              await openapi.createImage({
+                prompt: phrase as string,
+                n: 1,
+                size: '256x256',
+              })
+            ).data.data[0].url;
         axios
           .patch(`/api/game/${gameState.id}`, {
             action: {
@@ -63,6 +68,10 @@ export default function GameBoard({ gameState }: GameBoardProps) {
             mutate(`/api/game/${gameState.id}`).then(() =>
               setGeneratingImage(false)
             );
+          })
+          .catch(() => {
+            setBadMessage("Whoops couldn't save that message");
+            setGeneratingImage(false);
           });
       } catch (err) {
         setGeneratingImage(false);
@@ -85,6 +94,7 @@ export default function GameBoard({ gameState }: GameBoardProps) {
               fieldName="phrase"
               label={gameState.activeRound === 1 ? 'Starting phrase' : 'Guess'}
               error={badMessage}
+              required
             />
             <div className="flex justify-end">
               <button
