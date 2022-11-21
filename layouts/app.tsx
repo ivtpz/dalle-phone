@@ -1,14 +1,13 @@
 import { ReactNode } from 'react';
-import { Rubik } from '@next/font/google';
 import NavHeader from '../ui/organisms/NavHeader';
 
-const rubik = Rubik({
-  weight: '400',
-});
+interface LayoutProps {
+  children: ReactNode;
+}
 
-export default function Layout({ children }: { children: ReactNode }) {
+export default function Layout({ children }: LayoutProps) {
   return (
-    <main className={rubik.className}>
+    <main>
       <NavHeader />
       <div className="m-6">{children}</div>
     </main>
