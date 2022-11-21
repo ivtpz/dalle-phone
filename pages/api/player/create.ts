@@ -2,12 +2,12 @@
 import { setCookie } from 'cookies-next';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { create } from '../../../service/player';
-import type { PlayerData } from '../../../service/player';
+import type { IPlayerData } from '../../../service/player';
 import connect from '../../../db/connection';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<PlayerData>
+  res: NextApiResponse<IPlayerData>
 ) {
   await connect();
   const { method, body } = req;

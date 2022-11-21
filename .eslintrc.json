@@ -19,6 +19,7 @@
     "no-case-declarations": "off",
     "react/require-default-props": "off",
     "react/react-in-jsx-scope": "off",
-    "prettier/prettier": 2
+    "prettier/prettier": 2,
+    "react/jsx-props-no-spreading": "warn"
   }
 }

@@ -1,14 +1,13 @@
 import axios, { AxiosResponse } from 'axios';
 import React, { SyntheticEvent, useEffect, useState } from 'react';
 import { BiInfoCircle } from 'react-icons/bi';
-import { IPlayer } from '../../db/schemas/player';
-import { Stringified } from '../../db/types';
+import { IPlayerData } from '../../service/player';
 import InputField from '../molecules/InputField';
 
 interface CreateOrJoinGameFormProps {
   onJoined: (res: AxiosResponse) => void;
   gameID?: string | null;
-  player: Stringified<IPlayer> | null;
+  player: IPlayerData | null;
   disabled?: boolean;
 }
 
@@ -33,9 +32,11 @@ export default function CreateOrJoinGameForm({
     const playerName = data.get('playerName');
     const apiKey = data.get('apiKey') as string;
     const org = data.get('orgID') as string;
-    if (playerName && apiKey && org) {
-      localStorage.setItem('playerAPIKey', apiKey);
-      localStorage.setItem('playerOrg', org);
+    if (playerName) {
+      if (apiKey && org) {
+        localStorage.setItem('playerAPIKey', apiKey);
+        localStorage.setItem('playerOrg', org);
+      }
       let status = 200;
       if (playerName !== player?.name) {
         const res = await axios.post('/api/player/create', { playerName });
@@ -61,6 +62,7 @@ export default function CreateOrJoinGameForm({
             fieldName="playerName"
             label="Name"
             defaultValue={player?.name}
+            required
           />
           <InputField
             type="password"

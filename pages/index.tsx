@@ -2,11 +2,10 @@ import { getCookie } from 'cookies-next';
 import React from 'react';
 import type { NextPageContext } from 'next/types';
 import { AxiosResponse } from 'axios';
-import { IPlayer } from '../db/schemas/player';
 import styles from '../styles/Home.module.css';
 import CreateGameForm from '../ui/organisms/CreateOrJoinGameForm';
-import { Stringified } from '../db/types';
 import connect from '../db/connection';
+import { IPlayerData } from '../service/player';
 
 export async function getServerSideProps(context: NextPageContext) {
   await connect();
@@ -19,7 +18,7 @@ export async function getServerSideProps(context: NextPageContext) {
 }
 
 interface HomeProps {
-  player: Stringified<IPlayer>;
+  player: IPlayerData;
 }
 
 export default function Home({ player }: HomeProps) {

@@ -4,12 +4,13 @@ import React, { useState } from 'react';
 import { useSWRConfig } from 'swr';
 import { IPlayer } from '../../db/schemas/player';
 import { Stringified } from '../../db/types';
+import { IPlayerData } from '../../service/player';
 import CopyURL from '../molecules/CopyURL';
 import CreateOrJoinGameForm from './CreateOrJoinGameForm';
 
 interface LobbyProps {
   players: Stringified<IPlayer>[];
-  player: Stringified<IPlayer> | null;
+  player: IPlayerData | null;
   gameID: string;
   hasJoined?: boolean;
 }
