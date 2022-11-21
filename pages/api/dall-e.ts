@@ -29,7 +29,7 @@ export default async function handler(
     case 'GET':
       const { search } = req.query;
       const result = await openai.createImage({
-        prompt: search,
+        prompt: search as string,
         n: 1,
         size: '256x256',
       });
