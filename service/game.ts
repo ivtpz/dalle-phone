@@ -164,7 +164,7 @@ export type Result =
 export async function handleAction(
   action: Action,
   game: HydratedDocument<IGame>,
-  player: HydratedDocument<IPlayer>
+  player: IPlayerData
 ): Promise<Result> {
   // TODO: Ensure one game action is processed per game at a time
   switch (action.type) {

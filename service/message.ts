@@ -1,9 +1,9 @@
 import { HydratedDocument } from 'mongoose';
 import { IGame } from '../db/schemas/game';
 import { IMessage, Message } from '../db/schemas/message';
-import { IPlayer } from '../db/schemas/player';
 import { IPlayerOrdering, PlayerOrdering } from '../db/schemas/playerOrdering';
 import { Stringified } from '../db/types';
+import { IPlayerData } from './player';
 
 /**
  * Creates a message record and adds it to the game's messages.
@@ -12,7 +12,7 @@ import { Stringified } from '../db/types';
  */
 export async function addMessageToGame(
   game: HydratedDocument<IGame>,
-  player: HydratedDocument<IPlayer>,
+  player: IPlayerData,
   phrase: string,
   imageURL: string,
   round: number
